@@ -10,7 +10,15 @@ import adminRoutes from './routes/adminRoutes.js';
 import teacherRoutes from './routes/teacherRoutes.js';
 import semesterRoutes from './routes/semesterRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
+import cron from 'node-cron';
+import moment from 'moment'; 
+import Semester from './models/semesterModel.js'
+import { getSemestersForArchiving } from './controllers/adminController.js';
+import ArchivedSemester from './models/archiveSemesterModel.js'; 
 
+
+
+// Create the predefined accounts
 import { createPredefinedStudents } from './createStudent.js';
 import { createPredefinedSemester } from './createSemester.js'; 
 import { createPredefinedTeachers } from './createTeacher.js'; 
@@ -30,13 +38,62 @@ app.use(express.urlencoded({ extended: true })); // For parsing application/x-ww
 app.use(express.json()); // For parsing application/json
 app.use(cookieParser()); // Middleware for parsing cookies
 
+
 // Connect to the database
 connectDB()
     .then(() => {
         console.log('Connected to MongoDB');
 
-
-
+        /*cron.schedule('* * * * *', async () => {
+            console.log("Cron job triggered");
+        
+            try {
+                // Fetch semesters for archiving, including strand and yearLevel populated
+                const semesters = await Semester.find()
+                    .populate('strand', 'name')  // Populate strand name
+                    .populate('yearLevel', 'name')  // Populate yearLevel name
+                    .select('name strand yearLevel startDate endDate'); // Select relevant fields
+        
+                console.log(`Fetched ${semesters.length} semesters`);
+        
+                const currentDate = moment().startOf('day');  // Using startOf to ignore the time component
+                console.log(`Current Date: ${currentDate.format('YYYY-MM-DD')}`);
+        
+                for (const semester of semesters) {
+                    const endDate = moment(semester.endDate).startOf('day');  // Ensure we're comparing the date part only
+                    console.log(`Checking semester: ${semester.name}, End Date: ${endDate.format('YYYY-MM-DD')}`);
+        
+                    // Check if the current date is after the semester's end date
+                    if (currentDate.isAfter(endDate)) {
+                        console.log(`Archiving semester: ${semester.name}`);
+        
+                        try {
+                            const archivedSemester = new ArchivedSemester({
+                                name: semester.name,
+                                strand: semester.strand,
+                                yearLevel: semester.yearLevel,
+                                startDate: semester.startDate,
+                                endDate: semester.endDate,
+                            });
+                        
+                            const result = await archivedSemester.save();
+                            console.log('Archived semester saved successfully:', result);
+                            await Semester.deleteOne({ _id: semester._id });
+                            console.log(`Successfully deleted semester: ${semester.name}`);
+                        } catch (error) {
+                            console.error('Error saving archived semester:', error);
+                        }
+                    } else {
+                        console.log(`Skipping semester: ${semester.name}, not past end date.`);
+                    }
+                }
+            } catch (error) {
+                console.error('Error during cron job execution:', error);
+            }
+        });*/
+        
+        
+   
         // Create the predefined accounts (uncomment if needed)
         // createPredefinedSuperAdmin();
         // createPredefinedStudents();

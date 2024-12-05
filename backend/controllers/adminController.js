@@ -6,6 +6,7 @@ import Subject from '../models/subjectModel.js';
 import Student from '../models/studentModel.js';
 import Semester from '../models/semesterModel.js';
 import YearLevel from '../models/yearLevelModel.js';
+import ArchivedSemester from '../models/archiveSemesterModel.js';
 import bcrypt from 'bcryptjs';
 
 import mongoose from 'mongoose';
@@ -884,6 +885,28 @@ const getAllSemesters = asyncHandler(async (req, res) => {
     res.json(formattedSemesters);
 });
 
+
+const getSemestersForArchiving = asyncHandler(async () => {
+    try {
+        // Fetch semesters and their end dates from the database
+        const semesters = await Semester.find()
+            .select('name startDate endDate')  // Select only the name and endDate fields
+            .sort({ createdAt: -1 }); // Sort by creation date (optional)
+
+        // Check if there are any semesters
+        if (!semesters || semesters.length === 0) {
+            console.log('No semesters found for archiving');
+            return [];  // Return empty array if no semesters found
+        }
+
+        // Return the fetched semesters
+        return semesters;
+    } catch (error) {
+        console.error('Error fetching semesters for archiving:', error);
+        throw error;  // Rethrow error to be caught in the cron job
+    }
+});
+
 // @desc    Update a semester
 // @route   PUT /api/admin/semesters/:id
 // @access  Private (admin role)
@@ -1008,6 +1031,7 @@ const getAvailableAdvisorySections = asyncHandler(async (req, res) => {
 });
 
 
+
 // Exporting functions
 export { 
     createUserAccount,
@@ -1035,5 +1059,6 @@ export {
     initializeYearLevels,
     getAllYearLevels,
     filterSubjects,
-    getAvailableAdvisorySections
+    getAvailableAdvisorySections,
+    getSemestersForArchiving
 };

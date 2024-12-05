@@ -1,67 +1,60 @@
 import { Nav } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Link } from 'react-router-dom';
 import './AdminSidebar.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
 const AdminSidebar = () => {
-    const [loading, setLoading] = useState(false); // Define loading state
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const navigate = useNavigate(); // Define navigate
+    const navigate = useNavigate();
 
-  
     const handleLogOut = async (e) => {
-        e.preventDefault(); // Prevent the default behavior of the event
-        setLoading(true);   // Set loading state to true
-        setError('');       // Clear any previous errors
-    
+        e.preventDefault();
+        setLoading(true);
+        setError('');
         try {
             const response = await fetch('/api/users/logout', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include', // Include cookies in the request if they're used for authentication
+                credentials: 'include',
             });
-    
+
             if (!response.ok) {
                 throw new Error('Logout failed');
             }
-    
-            // Clear token and user info from local storage
-            localStorage.removeItem('token'); // Clear token if stored locally
-            localStorage.removeItem('userInfo'); // Remove additional user data if stored
-    
-            // Redirect to the login page
+
+            localStorage.removeItem('token');
+            localStorage.removeItem('userInfo');
             navigate('/login');
             console.log('Logout successful');
         } catch (err) {
-            setError(err.message); // Display error message in the UI
-            console.error('Error during logout:', err.message); // Log the error for debugging
+            setError(err.message);
+            console.error('Error during logout:', err.message);
         } finally {
-            setLoading(false); // Reset the loading state
+            setLoading(false);
         }
     };
 
     const [dropdowns, setDropdowns] = useState({
         users: false,
         academic: false,
-        settings: false
+        archive: false, // Archive dropdown
+        settings: false,
     });
 
     const toggleDropdown = (key) => {
         setDropdowns(prev => ({
             ...prev,
-            [key]: !prev[key]
+            [key]: !prev[key],
         }));
     };
 
     return (
-
         <div className="sidebar">
             <div className="sidebar-header">
                 <h3>Admin Panel</h3>
@@ -74,46 +67,44 @@ const AdminSidebar = () => {
                     </Nav.Link>
                 </LinkContainer>
 
-<div className="sidebar-dropdown">
-    <div className="sidebar-link" onClick={() => toggleDropdown('users')}>
-        <i className="bi bi-people-fill"></i>
-        <span>Users Management</span>
-        <i className={`bi bi-chevron-${dropdowns.users ? 'up' : 'down'} ms-auto`}></i>
-    </div>
-    <div className={`sidebar-dropdown-content ${dropdowns.users ? 'show' : ''}`}>
-        <LinkContainer to="/admin/AdminViewAllUsersScreen">
-            <Nav.Link>
-                <i className="bi bi-person-lines-fill"></i>
-                View All Users
-            </Nav.Link>
-        </LinkContainer>
-        <LinkContainer to="/admin/AdminCreateStudentAccount">
-            <Nav.Link>
-                <i className="bi bi-person-plus-fill"></i>
-                Add Student Account
-            </Nav.Link>
-        </LinkContainer>
-        <LinkContainer to="/admin/AdminCreateTeacherAccount">
-            <Nav.Link>
-                <i className="bi bi-person-badge-fill"></i>
-                Add Teacher Account
-            </Nav.Link>
-        </LinkContainer>
-    </div>
-</div>
+                {/* Users Management */}
+                <div className="sidebar-dropdown">
+                    <div className="sidebar-link" onClick={() => toggleDropdown('users')}>
+                        <i className="bi bi-people-fill"></i>
+                        <span>Users Management</span>
+                        <i className={`bi bi-chevron-${dropdowns.users ? 'up' : 'down'} ms-auto`}></i>
+                    </div>
+                    <div className={`sidebar-dropdown-content ${dropdowns.users ? 'show' : ''}`}>
+                        <LinkContainer to="/admin/AdminViewAllUsersScreen">
+                            <Nav.Link>
+                                <i className="bi bi-person-lines-fill"></i> View All Users
+                            </Nav.Link>
+                        </LinkContainer>
+                        <LinkContainer to="/admin/AdminCreateStudentAccount">
+                            <Nav.Link>
+                                <i className="bi bi-person-plus-fill"></i> Add Student Account
+                            </Nav.Link>
+                        </LinkContainer>
+                        <LinkContainer to="/admin/AdminCreateTeacherAccount">
+                            <Nav.Link>
+                                <i className="bi bi-person-badge-fill"></i> Add Teacher Account
+                            </Nav.Link>
+                        </LinkContainer>
+                    </div>
+                </div>
 
-                {/* Academic Management Dropdown */}
+                {/* Academic Management */}
                 <div className="sidebar-dropdown">
                     <div className="sidebar-link" onClick={() => toggleDropdown('academic')}>
-                    <i className="bi bi-diagram-3"></i>
+                        <i className="bi bi-diagram-3"></i>
                         <span>Academic Management</span>
                         <i className={`bi bi-chevron-${dropdowns.academic ? 'up' : 'down'} ms-auto`}></i>
                     </div>
                     <div className={`sidebar-dropdown-content ${dropdowns.academic ? 'show' : ''}`}>
                         <LinkContainer to="/admin/strands">
-                        <Nav.Link as={Link} to="/admin/strands">
-                            Manage Strands
-                        </Nav.Link>
+                            <Nav.Link>
+                                Manage Strands
+                            </Nav.Link>
                         </LinkContainer>
                         <LinkContainer to="/admin/ManageSections">
                             <Nav.Link>Manage Sections</Nav.Link>
@@ -127,8 +118,24 @@ const AdminSidebar = () => {
                     </div>
                 </div>
 
-                     {/* Logout Link */}
-                     <div className="sidebar-footer">
+                {/* Archive Management */}
+                <div className="sidebar-dropdown">
+                    <div className="sidebar-link" onClick={() => toggleDropdown('archive')}>
+                        <i className="bi bi-archive"></i>
+                        <span>Archive Management</span>
+                        <i className={`bi bi-chevron-${dropdowns.archive ? 'up' : 'down'} ms-auto`}></i>
+                    </div>
+                    <div className={`sidebar-dropdown-content ${dropdowns.archive ? 'show' : ''}`}>
+                        <LinkContainer to="/admin/ArchivedSemesters">
+                            <Nav.Link>
+                                <i className="bi bi-clock-history"></i> View Archived Semesters
+                            </Nav.Link>
+                        </LinkContainer>
+                    </div>
+                </div>
+
+                {/* Logout */}
+                <div className="sidebar-footer">
                     <div className="logout-link">
                         <Nav.Link onClick={handleLogOut} className="sidebar-link">
                             <i className="bi bi-box-arrow-right"></i>
@@ -139,6 +146,6 @@ const AdminSidebar = () => {
             </Nav>
         </div>
     );
-}
+};
 
 export default AdminSidebar;

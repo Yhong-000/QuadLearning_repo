@@ -1,0 +1,134 @@
+/* ArchiveSemesterScreen.css */
+
+/* Main container styling */
+.archive-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-top: 20px;
+  }
+  
+  /* Sidebar styling */
+  .archive-sidebar {
+    width: 200px;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .archive-sidebar ul {
+    list-style: none;
+    padding-left: 0;
+  }
+  
+  .archive-sidebar li {
+    margin-bottom: 15px;
+  }
+  
+  .archive-sidebar li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+  }
+  
+  .archive-sidebar li a:hover {
+    color: #007bff;
+  }
+  
+  /* Table container styling */
+  .archive-table-container {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  .archive-table-container h2 {
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+  }
+  
+  /* Table styling */
+  .archive-table-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .archive-table-container th, .archive-table-container td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #ddd;
+  }
+  
+  .archive-table-container th {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .archive-table-container td {
+    background-color: #f9f9f9;
+  }
+  
+  .archive-table-container tr:hover {
+    background-color: #f1f1f1;
+  }
+  
+  .archive-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .archive-pagination .page-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .archive-pagination .page-btn:disabled {
+    background-color: #ddd;
+    cursor: not-allowed;
+  }
+  
+  .archive-pagination .page-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Modal Styling */
+  .archive-modal .modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .archive-modal .modal-body {
+    padding: 15px;
+  }
+  
+  .archive-modal .modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #ddd;
+  }
+  
+  .archive-modal .btn-confirm {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 15px;
+  }
+  
+  .archive-modal .btn-cancel {
+    background-color: #6c757d;
+    color: white;
+    padding: 8px 15px;
+  }
+  
+  /* Header styles */
+  .archive-header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 1.25rem;
+  }
+  

@@ -25,11 +25,6 @@ const semesterSchema = new mongoose.Schema({
       ref: 'Subject',
       required: false 
     }], 
-    yearLevel: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'YearLevel', // Reference to the YearLevel model
-      required: true, // Each section must have a year level assigned
-    }, // Link to the YearLevel mode
     endDate: {
         type: Date,
         required: true

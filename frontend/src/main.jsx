@@ -26,6 +26,9 @@ import TeacherEncodeGrade from './TeacherScreens/TeacherEncodeGrade';
 import TeacherGenerateForm from './TeacherScreens/TeacherGenerateForm';
 import StudentProfile from './StudentScreens/StudentProfile';
 import StudentViewGrades from './StudentScreens/StudentViewGrades';
+import ArchivedSemesters from './AdminScreens/AdminArchiveSemester'; // New import
+import ArchiveSemester from './AdminScreens/AdminArchiveSemester'; // New import
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<App />}>
@@ -38,15 +41,19 @@ const router = createBrowserRouter(
       <Route path='/login/StudentScreens/StudentHomeScreen' element={<StudentHomeScreen />} />
       <Route path='/login/TeacherScreens/TeacherHomeScreen' element={<TeacherHomeScreen />} />
       <Route path='/admin/AdminCreateStudentAccount/' element={<AdminCreateStudentAccount />} />
-      <Route path='/admin/AdminCreateTeacherAccount' element={<AdminCreateTeacherAccount />}/>
-      <Route path='/admin/ManageSubjects' element={<ManageSubjects />}/>
-      <Route path='/admin/ManageSemesters' element={<ManageSemesters />}/>
-      <Route path='/admin/ManageSections' element={<ManageSections />}/>
-      <Route path='/login/TeacherScreens/TeacherViewStudents' element={<TeacherViewStudents />}/>
-      <Route path='/login/TeacherScreens/TeacherEncodeGrade' element={<TeacherEncodeGrade />}/>
-      <Route path='/login/TeacherScreens/TeacherGenerateForm' element={<TeacherGenerateForm />}/>
-      <Route path='/login/StudentScreens/StudentProfile' element={<StudentProfile />}/>
-      <Route path='/login/StudentScreens/StudentViewGrades' element={<StudentViewGrades />}/>
+      <Route path='/admin/AdminCreateTeacherAccount' element={<AdminCreateTeacherAccount />} />
+      <Route path='/admin/ManageSubjects' element={<ManageSubjects />} />
+      <Route path='/admin/ManageSemesters' element={<ManageSemesters />} />
+      <Route path='/admin/ManageSections' element={<ManageSections />} />
+      <Route path='/login/TeacherScreens/TeacherViewStudents' element={<TeacherViewStudents />} />
+      <Route path='/login/TeacherScreens/TeacherEncodeGrade' element={<TeacherEncodeGrade />} />
+      <Route path='/login/TeacherScreens/TeacherGenerateForm' element={<TeacherGenerateForm />} />
+      <Route path='/login/StudentScreens/StudentProfile' element={<StudentProfile />} />
+      <Route path='/login/StudentScreens/StudentViewGrades' element={<StudentViewGrades />} />
+
+      {/* Archive Routes */}
+      <Route path='/admin/ArchivedSemesters' element={<ArchivedSemesters />} /> {/* Archived Semesters */}
+      <Route path='/admin/ArchiveSemester' element={<ArchiveSemester />} /> {/* Archive Semester */}
     </Route>
   )
 );

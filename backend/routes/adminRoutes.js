@@ -38,4 +38,5 @@ router.route('/advisorySections').get(protect, authorizeRoles('admin'), getAvail
 
 router.post('/yearLevels/init', protect, authorizeRoles('admin'), initializeYearLevels);
 router.route('/yearLevels').get(protect, authorizeRoles('admin'), getAllYearLevels);
+
 export default router;

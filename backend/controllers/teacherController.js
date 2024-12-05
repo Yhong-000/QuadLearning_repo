@@ -251,95 +251,101 @@ const importStudents = asyncHandler(async (req, res) => {
 // @route   POST /api/teacher/grades
 // @access  Private (teacher role)
 const addGrade = asyncHandler(async (req, res) => {
-
-
     const { studentId, subjectId, gradeType, gradeValue, semesterId } = req.body;
-
+  
     // Validate input
     if (!studentId || !subjectId || !gradeType || !semesterId) {
-        res.status(400);
-        throw new Error('All fields are required');
+      res.status(400);
+      throw new Error("All fields are required");
     }
-
-    // Validate grade value
+  
     if (gradeValue < 0 || gradeValue > 100) {
-
-        res.status(400);
-        throw new Error('Grade must be between 0 and 100');
+      res.status(400);
+      throw new Error("Grade must be between 0 and 100");
     }
-
-
+  
     try {
-        // Find the student
-        const student = await Student.findOne({ user: studentId });
-        if (!student) {
-            res.status(404);
-            throw new Error('Student not found');
-        }
-
-        // Find or create semester grades
-        let semesterGrades = student.grades.find(g => 
-            g.semester.toString() === semesterId
-        );
-
-        if (!semesterGrades) {
-            student.grades.push({
-                semester: semesterId,
-                subjects: []
-            });
-            semesterGrades = student.grades[student.grades.length - 1];
-        }
-
-        // Find or create subject grades
-        let subjectGrade = semesterGrades.subjects.find(s => 
-            s.subject.toString() === subjectId
-        );
-
-        if (!subjectGrade) {
-            semesterGrades.subjects.push({
-                subject: subjectId,
-                midterm: null,
-                finals: null,
-                finalRating: null,
-                action: null
-            });
-            subjectGrade = semesterGrades.subjects[semesterGrades.subjects.length - 1];
-        }
-
-        // Update the grade
-        if (gradeType === 'midterm') {
-            subjectGrade.midterm = gradeValue;
-        } else if (gradeType === 'finals') {
-            subjectGrade.finals = gradeValue;
-        }
-
-        // Calculate final rating if both grades exist
-        if (subjectGrade.midterm !== null && subjectGrade.finals !== null) {
-            subjectGrade.finalRating = (subjectGrade.midterm + subjectGrade.finals) / 2;
-            subjectGrade.action = subjectGrade.finalRating >= 75 ? 'PASSED' : 'FAILED';
-        }
-
-        // Save the updated student record
-        await student.save();
-
-        res.status(200).json({
-            success: true,
-            data: {
-                studentId,
-                subjectId,
-                gradeType,
-                gradeValue,
-                finalRating: subjectGrade.finalRating,
-                action: subjectGrade.action
-            }
+      // Step 1: Find and update or upsert the semester
+      const student = await Student.findOneAndUpdate(
+        { user: studentId },
+        {
+          $setOnInsert: { grades: [] }, // Initialize grades if the student doesn't have it
+        },
+        { new: true, upsert: true }
+      );
+  
+      if (!student) {
+        res.status(404);
+        throw new Error("Student not found");
+      }
+  
+      // Check if the semester exists
+      const semesterIndex = student.grades.findIndex(
+        (g) => g.semester.toString() === semesterId
+      );
+  
+      if (semesterIndex === -1) {
+        // Add the new semester
+        student.grades.push({
+          semester: semesterId,
+          subjects: [],
         });
-
+      }
+  
+      // Check if the subject exists
+      const subjectIndex = student.grades[semesterIndex]?.subjects.findIndex(
+        (s) => s.subject.toString() === subjectId
+      );
+  
+      if (subjectIndex === -1) {
+        // Add the new subject
+        student.grades[semesterIndex].subjects.push({
+          subject: subjectId,
+          midterm: gradeType === "midterm" ? gradeValue : null,
+          finals: gradeType === "finals" ? gradeValue : null,
+          finalRating: null,
+          action: null,
+        });
+      } else {
+        // Update the existing subject
+        const subject = student.grades[semesterIndex].subjects[subjectIndex];
+        if (gradeType === "midterm") subject.midterm = gradeValue;
+        if (gradeType === "finals") subject.finals = gradeValue;
+  
+        // Recalculate final rating and action
+        if (subject.midterm !== null && subject.finals !== null) {
+          subject.finalRating = (subject.midterm + subject.finals) / 2;
+          subject.action = subject.finalRating >= 75 ? "PASSED" : "FAILED";
+        }
+      }
+  
+      // Save the updated document
+      await student.save();
+  
+      res.status(200).json({
+        success: true,
+        data: {
+          studentId,
+          subjectId,
+          gradeType,
+          gradeValue,
+        },
+      });
     } catch (error) {
-        console.error('Error saving grade:', error);
-        res.status(500);
-        throw new Error('Error saving grade: ' + error.message);
+      console.error("Error saving grade:", error);
+  
+      // Handle specific versioning error
+      if (error.name === "VersionError") {
+        res.status(409);
+        throw new Error(
+          "Version conflict detected. Please retry the operation."
+        );
+      }
+  
+      res.status(500);
+      throw new Error("Error saving grade: " + error.message);
     }
-});
+  });
 // @desc    Update grade for a student
 // @route   PUT /api/grades/:id
 // @access  Private (teacher role)
